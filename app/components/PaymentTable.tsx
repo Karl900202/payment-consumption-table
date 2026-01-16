@@ -45,7 +45,7 @@ export const PaymentTable = ({
     <div className="payment-table-container">
       <table className="payment-table">
         <thead>
-          {/* 1&2단 통합 헤더: Bold & Black */}
+          {/* 1&2단 통합 헤더 */}
           <tr className="payment-table-header-row">
             <th
               colSpan={8}
@@ -68,8 +68,6 @@ export const PaymentTable = ({
               Total
             </th>
           </tr>
-
-          {/* 2단 헤더: Payable 상세 (왼쪽 정렬 & Bold & Black) */}
 
           {/* 2단 헤더: Payable 상세 */}
           <tr className="payment-table-header-row">
@@ -127,7 +125,6 @@ export const PaymentTable = ({
                     </div>
                   </div>
 
-                  {/* Memo: flex-1을 주어 남는 하단 공간을 흰색 배경으로 모두 채움 */}
                   <div className="flex flex-1">
                     <span className="payment-table-payable-label">Memo</span>
                     <span className="payment-table-payable-value-truncate">
@@ -139,7 +136,7 @@ export const PaymentTable = ({
             ))}
           </tr>
 
-          {/* 3단 헤더: 컬럼 레이블 (Bold & Black) */}
+          {/* 3단 헤더: 컬럼 레이블 */}
           <tr className="payment-table-header-row-bottom">
             {[
               "Style No.",
@@ -241,7 +238,7 @@ export const PaymentTable = ({
                     </tr>
                   ))}
 
-                  {/* Sub.TTL 행: Bold & Black */}
+                  {/* Sub.TTL 행 */}
                   <tr className="payment-table-subtotal-row">
                     <td colSpan={7} className="px-2 py-2 text-right text-black">
                       Sub.TTL
