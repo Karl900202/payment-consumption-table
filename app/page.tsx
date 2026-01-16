@@ -8,7 +8,7 @@ export default function Page() {
 
   return (
     <main style={{ padding: 24 }}>
-      <h1>Payment</h1>
+    
 
       <PaymentTable
         consumptions={consumptions}

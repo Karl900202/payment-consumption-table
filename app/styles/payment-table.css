@@ -1,0 +1,105 @@
+/* Payment Table 공통 스타일 */
+
+/* 테이블 컨테이너 */
+.payment-table-container {
+  @apply w-full overflow-x-auto border border-gray-400 bg-white;
+}
+
+/* 테이블 기본 스타일 */
+.payment-table {
+  @apply w-full border-collapse text-[11px] min-w-max text-black font-sans;
+}
+
+/* 헤더 행 */
+.payment-table-header-row {
+  @apply bg-[#EBF1F7] border-b border-white;
+}
+
+.payment-table-header-row-bottom {
+  @apply bg-[#EBF1F7] border-b border-gray-400;
+}
+
+/* 헤더 셀 */
+.payment-table-header-cell {
+  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+}
+
+/* Amount 헤더 셀 - 고정 너비 */
+.payment-table-header-cell-amount {
+  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+  min-width: 90px;
+  width: 90px;
+}
+
+/* unit-price 헤더 셀 - 고정 너비 */
+.payment-table-header-cell-unit-price {
+  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+  min-width: 90px;
+  width: 90px;
+}
+
+/* 일반 데이터 셀 */
+.payment-table-cell {
+  @apply px-2 py-2 border-r border-gray-200 text-black;
+}
+
+/* 숫자 셀 (오른쪽 정렬) */
+.payment-table-cell-number {
+  @apply px-2 py-2 border-r border-gray-200 text-right text-black;
+}
+
+/* Amount 셀 */
+.payment-table-cell-amount {
+  @apply px-2 py-2 border-r border-gray-200 text-right text-black font-medium;
+}
+
+/* 달러 표시 */
+.payment-table-dollar {
+  @apply float-left;
+}
+
+/* 데이터 행 */
+.payment-table-data-row {
+  @apply border-b border-gray-100 hover:bg-gray-50;
+}
+
+/* Sub.TTL 행 */
+.payment-table-subtotal-row {
+  @apply bg-[#F8FAFC] border-b border-gray-300 font-bold text-black;
+}
+
+/* G.TTL 행 */
+.payment-table-grandtotal-row {
+  @apply bg-[#EBF1F7] border-b border-gray-400 font-bold text-black uppercase;
+}
+
+/* Payable 헤더 내부 스타일 */
+.payment-table-payable-label {
+  @apply w-24 px-3 py-2 bg-[#EBF1F7] font-bold text-black shrink-0;
+}
+
+.payment-table-payable-value-left {
+  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white text-left;
+}
+
+.payment-table-payable-value-center {
+  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white flex items-center gap-1;
+}
+
+.payment-table-payable-value-overflow {
+  @apply flex-1 px-3 py-2 bg-white border-l border-white overflow-hidden;
+}
+
+.payment-table-payable-value-truncate {
+  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white truncate text-left;
+}
+
+/* Paid 배지 */
+.payment-table-paid-badge {
+  @apply bg-[#EEF2FF] text-[#6366F1] px-1 rounded text-[9px] font-bold border border-[#6366F1]/20;
+}
+
+/* Attachment 파일 */
+.payment-table-attachment-file {
+  @apply bg-gray-200 border border-gray-300 px-2 py-0.5 rounded text-black text-[10px] truncate w-full;
+}

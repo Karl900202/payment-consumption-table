@@ -1,6 +1,11 @@
 import { Consumption, Payment, PaymentBreakdown } from "@/types/domain";
 import { useMemo, Fragment } from "react";
-import { formatCurrency, formatUnitPrice, formatNumber } from "@/lib/format";
+import {
+  formatCurrency,
+  formatUnitPrice,
+  formatNumber,
+  formatDate,
+} from "@/lib/format";
 
 interface PaymentTableProps {
   consumptions: Consumption[];
@@ -8,17 +13,9 @@ interface PaymentTableProps {
   paymentBreakdowns: PaymentBreakdown[];
 }
 
-interface SupplierItemGroup {
-  supplierItemCode: string;
-  items: Consumption[];
-  subtotal: number;
-}
-
 interface StyleGroup {
-  salesOrderId: number;
-  salesOrder: Consumption["salesOrder"];
-  supplierItemGroups: SupplierItemGroup[];
-  grandTotal: number;
+  sNo: string;
+  suppliers: Map<string, Consumption[]>;
 }
 
 export const PaymentTable = ({
@@ -26,202 +23,351 @@ export const PaymentTable = ({
   payments,
   paymentBreakdowns,
 }: PaymentTableProps) => {
-  const groupedConsumptions = useMemo(() => {
-    // 먼저 salesOrder.id로 그룹핑
-    const styleGroups = new Map<number, StyleGroup>();
-
-    consumptions.forEach((consumption) => {
-      const salesOrderId = consumption.salesOrder.id;
-
-      if (!styleGroups.has(salesOrderId)) {
-        styleGroups.set(salesOrderId, {
-          salesOrderId,
-          salesOrder: consumption.salesOrder,
-          supplierItemGroups: [],
-          grandTotal: 0,
-        });
-      }
-
-      const styleGroup = styleGroups.get(salesOrderId)!;
-
-      // 같은 salesOrder 내에서 supplierItemCode로 그룹핑
-      let supplierGroup = styleGroup.supplierItemGroups.find(
-        (g) => g.supplierItemCode === consumption.supplierItemCode
-      );
-
-      if (!supplierGroup) {
-        supplierGroup = {
-          supplierItemCode: consumption.supplierItemCode,
-          items: [],
-          subtotal: 0,
-        };
-        styleGroup.supplierItemGroups.push(supplierGroup);
-      }
-
-      supplierGroup.items.push(consumption);
-      supplierGroup.subtotal += consumption.orderAmount;
-      styleGroup.grandTotal += consumption.orderAmount;
+  const styleGroups = useMemo(() => {
+    const map = new Map<string, StyleGroup>();
+    consumptions.forEach((c) => {
+      const sNo = c.salesOrder.styleNumber;
+      if (!map.has(sNo)) map.set(sNo, { sNo, suppliers: new Map() });
+      const sGroup = map.get(sNo)!.suppliers;
+      if (!sGroup.has(c.supplierItemCode)) sGroup.set(c.supplierItemCode, []);
+      sGroup.get(c.supplierItemCode)!.push(c);
     });
-
-    return Array.from(styleGroups.values());
+    return Array.from(map.values());
   }, [consumptions]);
 
-  // 전체 합계 계산
-  const grandTotal = useMemo(() => {
-    return groupedConsumptions.reduce(
-      (sum, group) => sum + group.grandTotal,
-      0
-    );
-  }, [groupedConsumptions]);
+  const breakdownMap = useMemo(() => {
+    const map = new Map<string, PaymentBreakdown>();
+    paymentBreakdowns.forEach((b) => map.set(`${b.itemId}-${b.paymentId}`, b));
+    return map;
+  }, [paymentBreakdowns]);
 
   return (
-    <div className="w-full overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-4">Ordered</h2>
-      <table className="w-full border-collapse border border-gray-300 text-sm">
+    <div className="payment-table-container">
+      <table className="payment-table">
         <thead>
-          <tr className="bg-gray-100">
-            {/* Ordered 영역 헤더 */}
-            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
-              Style No.
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
-              Supplier Item #
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
-              Fabric Name
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
-              Fabric Color
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-right font-bold">
-              Order Qty
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-left font-bold">
-              Unit
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-right font-bold">
-              U/price
-            </th>
-            <th className="border border-gray-300 px-3 py-2 text-right font-bold">
-              Amount
-            </th>
-
-            {/* Payable 영역 헤더 (빈 테이블) */}
+          {/* 1&2단 통합 헤더: Bold & Black */}
+          <tr className="payment-table-header-row">
             <th
-              className="border border-gray-300 px-3 py-2 bg-gray-50"
-              colSpan={3}
+              colSpan={8}
+              rowSpan={2}
+              className="px-3 py-4 text-left font-bold border-r border-white align-middle text-sm text-black"
+            >
+              Ordered
+            </th>
+            <th
+              colSpan={payments.length * 3}
+              className="px-3 py-2 text-left font-bold border-r border-white text-sm text-black"
             >
               Payable
             </th>
-
-            {/* Total 영역 헤더 (빈 테이블) */}
             <th
-              className="border border-gray-300 px-3 py-2 bg-gray-50"
               colSpan={2}
+              rowSpan={2}
+              className="px-3 py-4 text-left font-bold align-middle text-sm text-black"
             >
               Total
             </th>
           </tr>
+
+          {/* 2단 헤더: Payable 상세 (왼쪽 정렬 & Bold & Black) */}
+
+          {/* 2단 헤더: Payable 상세 */}
+          <tr className="payment-table-header-row">
+            {payments.map((p) => (
+              <th
+                key={p.id}
+                colSpan={3}
+                className="p-0 border-r border-white align-top font-normal h-full" // h-full 추가
+              >
+                {/* h-full과 flex-col로 내부를 꽉 채움 */}
+                <div className="flex flex-col w-full h-full text-[11px]">
+                  {/* Payment Due */}
+                  <div className="flex border-b border-white">
+                    <span className="payment-table-payable-label">
+                      Payment Due
+                    </span>
+                    <span className="payment-table-payable-value-left">
+                      {formatDate(p.paymentDueDate)}
+                    </span>
+                  </div>
+
+                  {/* Payment Date */}
+                  <div className="flex border-b border-white">
+                    <span className="payment-table-payable-label">
+                      Payment Date
+                    </span>
+                    <div className="payment-table-payable-value-center">
+                      <span>{p.paidAt ? formatDate(p.paidAt) : "-"}</span>
+                      {p.paidAt && (
+                        <span className="payment-table-paid-badge">Paid</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Attachment */}
+                  <div className="flex border-b border-white">
+                    <span className="payment-table-payable-label">
+                      Attachment
+                    </span>
+                    <div className="payment-table-payable-value-overflow">
+                      {p.sourcingFiles.length > 0 ? (
+                        <div className="flex gap-1">
+                          {p.sourcingFiles.map((file, idx) => (
+                            <div
+                              key={idx}
+                              className="payment-table-attachment-file"
+                            >
+                              {String(file)}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Memo: flex-1을 주어 남는 하단 공간을 흰색 배경으로 모두 채움 */}
+                  <div className="flex flex-1">
+                    <span className="payment-table-payable-label">Memo</span>
+                    <span className="payment-table-payable-value-truncate">
+                      {p.memo || ""}
+                    </span>
+                  </div>
+                </div>
+              </th>
+            ))}
+          </tr>
+
+          {/* 3단 헤더: 컬럼 레이블 (Bold & Black) */}
+          <tr className="payment-table-header-row-bottom">
+            {[
+              "Style No.",
+              "Supplier Item #",
+              "Fabric Name",
+              "Fabric Color",
+            ].map((h) => (
+              <th key={h} className="payment-table-header-cell">
+                {h}
+              </th>
+            ))}
+            <th className="payment-table-header-cell">Order Qty</th>
+            <th className="payment-table-header-cell">Unit</th>
+            <th className="payment-table-header-cell-unit-price">U/price</th>
+            <th className="payment-table-header-cell-amount">Amount</th>
+            {payments.map((p) => (
+              <Fragment key={p.id}>
+                <th className="payment-table-header-cell">Shipped Qty</th>
+                <th className="payment-table-header-cell-unit-price">
+                  U/price
+                </th>
+                <th className="payment-table-header-cell-amount">Amount</th>
+              </Fragment>
+            ))}
+            <th className="payment-table-header-cell">Qty</th>
+            <th className="payment-table-header-cell-amount">Amount</th>
+          </tr>
         </thead>
-        <tbody>
-          {groupedConsumptions.map((styleGroup) => (
-            <Fragment key={styleGroup.salesOrderId}>
-              {styleGroup.supplierItemGroups.map((supplierGroup) => (
-                <Fragment key={supplierGroup.supplierItemCode}>
-                  {supplierGroup.items.map((item) => {
-                    return (
-                      <tr key={item.id}>
-                        {/* Ordered 영역 데이터 */}
-                        <td className="border border-gray-300 px-3 py-2 text-left">
-                          {styleGroup.salesOrder.styleNumber}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-left">
-                          {item.supplierItemCode}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-left">
-                          {item.fabricName}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-left">
-                          {item.colorName}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-right">
-                          {formatNumber(item.orderQuantity)}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-left">
-                          {item.unit}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-right">
-                          {formatUnitPrice(item.unitPrice)}
-                        </td>
-                        <td className="border border-gray-300 px-3 py-2 text-right">
-                          {formatCurrency(item.orderAmount)}
-                        </td>
 
-                        {/* Payable 영역 (빈 셀) */}
-                        <td className="border border-gray-300 px-3 py-2 bg-gray-50"></td>
-                        <td className="border border-gray-300 px-3 py-2 bg-gray-50"></td>
-                        <td className="border border-gray-300 px-3 py-2 bg-gray-50"></td>
+        {/* 데이터 영역 */}
+        <tbody className="font-normal text-black">
+          {styleGroups.map((style) => (
+            <Fragment key={style.sNo}>
+              {Array.from(style.suppliers.entries()).map(([supCode, items]) => (
+                <Fragment key={supCode}>
+                  {items.map((item: Consumption) => (
+                    <tr key={item.id} className="payment-table-data-row">
+                      <td className="payment-table-cell">
+                        {item.salesOrder.styleNumber}
+                      </td>
+                      <td className="payment-table-cell">
+                        {item.supplierItemCode}
+                      </td>
+                      <td className="payment-table-cell">{item.fabricName}</td>
+                      <td className="payment-table-cell">{item.colorName}</td>
+                      <td className="payment-table-cell-number">
+                        {formatNumber(item.orderQuantity)}
+                      </td>
+                      <td className="payment-table-cell">{item.unit}</td>
+                      <td className="payment-table-cell-number">
+                        <span className="payment-table-dollar">$</span>{" "}
+                        {formatUnitPrice(item.unitPrice)}
+                      </td>
+                      <td className="payment-table-cell-number">
+                        <span className="payment-table-dollar">$</span>{" "}
+                        {formatCurrency(item.orderAmount)}
+                      </td>
+                      {payments.map((p) => {
+                        const b = breakdownMap.get(`${item.id}-${p.id}`);
+                        return (
+                          <Fragment key={p.id}>
+                            <td className="payment-table-cell-number">
+                              {b ? formatNumber(b.shippedQuantity) : ""}
+                            </td>
+                            <td className="payment-table-cell-number">
+                              {b ? (
+                                <>
+                                  <span className="payment-table-dollar">
+                                    $
+                                  </span>{" "}
+                                  {formatUnitPrice(b.unitPrice)}
+                                </>
+                              ) : (
+                                ""
+                              )}
+                            </td>
+                            <td className="payment-table-cell-number">
+                              {b ? (
+                                <>
+                                  <span className="payment-table-dollar">
+                                    $
+                                  </span>{" "}
+                                  {formatCurrency(b.amount)}
+                                </>
+                              ) : (
+                                ""
+                              )}
+                            </td>
+                          </Fragment>
+                        );
+                      })}
+                      <td className="payment-table-cell-number">
+                        {formatNumber(item.orderQuantity)}
+                      </td>
+                      <td className="payment-table-cell-number">
+                        <span className="payment-table-dollar">$</span>{" "}
+                        {formatCurrency(item.orderAmount)}
+                      </td>
+                    </tr>
+                  ))}
 
-                        {/* Total 영역 (빈 셀) */}
-                        <td className="border border-gray-300 px-3 py-2 bg-gray-50"></td>
-                        <td className="border border-gray-300 px-3 py-2 bg-gray-50"></td>
-                      </tr>
-                    );
-                  })}
-
-                  {/* Supplier Item # 그룹별 Sub Total 행 */}
-                  <tr className="bg-gray-100">
-                    <td
-                      className="border border-gray-300 px-3 py-2 text-right font-semibold"
-                      colSpan={7}
-                    >
+                  {/* Sub.TTL 행: Bold & Black */}
+                  <tr className="payment-table-subtotal-row">
+                    <td colSpan={7} className="px-2 py-2 text-right text-black">
                       Sub.TTL
                     </td>
-                    <td className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                      {formatCurrency(supplierGroup.subtotal)}
+                    <td className="payment-table-cell-number border-r border-gray-300">
+                      <span className="payment-table-dollar">$</span>{" "}
+                      {formatCurrency(
+                        items.reduce(
+                          (acc: number, cur: Consumption) =>
+                            acc + cur.orderAmount,
+                          0
+                        )
+                      )}
                     </td>
-
-                    {/* Payable 영역 (빈 셀) */}
-                    <td
-                      className="border border-gray-300 px-3 py-2 bg-gray-50"
-                      colSpan={3}
-                    ></td>
-
-                    {/* Total 영역 (빈 셀) */}
-                    <td
-                      className="border border-gray-300 px-3 py-2 bg-gray-50"
-                      colSpan={2}
-                    ></td>
+                    {payments.map((p) => {
+                      const supAmt = items.reduce(
+                        (acc: number, cur: Consumption) =>
+                          acc +
+                          (breakdownMap.get(`${cur.id}-${p.id}`)?.amount || 0),
+                        0
+                      );
+                      const supQty = items.reduce(
+                        (acc: number, cur: Consumption) =>
+                          acc +
+                          (breakdownMap.get(`${cur.id}-${p.id}`)
+                            ?.shippedQuantity || 0),
+                        0
+                      );
+                      return (
+                        <Fragment key={p.id}>
+                          <td className="payment-table-cell-number font-bold">
+                            {formatNumber(supQty)}
+                          </td>
+                          <td className="border-r border-gray-200"></td>
+                          <td className="payment-table-cell-number border-r border-gray-300 font-bold">
+                            <span className="payment-table-dollar">$</span>{" "}
+                            {formatCurrency(supAmt)}
+                          </td>
+                        </Fragment>
+                      );
+                    })}
+                    <td className="payment-table-cell-number font-bold">
+                      {formatNumber(
+                        items.reduce(
+                          (acc: number, cur: Consumption) =>
+                            acc + cur.orderQuantity,
+                          0
+                        )
+                      )}
+                    </td>
+                    <td className="payment-table-cell-number font-bold border-l border-gray-100">
+                      <span className="payment-table-dollar">$</span>{" "}
+                      {formatCurrency(
+                        items.reduce(
+                          (acc: number, cur: Consumption) =>
+                            acc + cur.orderAmount,
+                          0
+                        )
+                      )}
+                    </td>
                   </tr>
                 </Fragment>
               ))}
+
+              {/* G.TTL 행 */}
+              <tr className="payment-table-grandtotal-row">
+                <td colSpan={7} className="px-2 py-2 text-right text-black">
+                  G.TTL
+                </td>
+                <td className="payment-table-cell-number border-r border-white">
+                  <span className="payment-table-dollar">$</span>{" "}
+                  {formatCurrency(
+                    consumptions
+                      .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                      .reduce((acc, cur) => acc + cur.orderAmount, 0)
+                  )}
+                </td>
+                {payments.map((p) => {
+                  const styleAmt = consumptions
+                    .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                    .reduce(
+                      (acc, cur) =>
+                        acc +
+                        (breakdownMap.get(`${cur.id}-${p.id}`)?.amount || 0),
+                      0
+                    );
+                  const styleQty = consumptions
+                    .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                    .reduce(
+                      (acc, cur) =>
+                        acc +
+                        (breakdownMap.get(`${cur.id}-${p.id}`)
+                          ?.shippedQuantity || 0),
+                      0
+                    );
+                  return (
+                    <Fragment key={p.id}>
+                      <td className="payment-table-cell-number font-bold align-middle">
+                        {formatNumber(styleQty)}
+                      </td>
+                      <td className="border-r border-white align-middle"></td>
+                      <td className="payment-table-cell-number border-r border-white font-bold align-middle">
+                        <span className="payment-table-dollar">$</span>{" "}
+                        {formatCurrency(styleAmt)}
+                      </td>
+                    </Fragment>
+                  );
+                })}
+                <td className="payment-table-cell-number font-bold align-middle">
+                  {formatNumber(
+                    consumptions
+                      .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                      .reduce((acc, cur) => acc + cur.orderQuantity, 0)
+                  )}
+                </td>
+                <td className="payment-table-cell-number font-bold align-middle">
+                  <span className="payment-table-dollar">$</span>{" "}
+                  {formatCurrency(
+                    consumptions
+                      .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                      .reduce((acc, cur) => acc + cur.orderAmount, 0)
+                  )}
+                </td>
+              </tr>
             </Fragment>
           ))}
-
-          {/* Grand Total 행 */}
-          <tr className="bg-gray-100">
-            <td
-              className="border border-gray-300 px-3 py-2 text-right font-bold"
-              colSpan={7}
-            >
-              G.TTL
-            </td>
-            <td className="border border-gray-300 px-3 py-2 text-right font-bold">
-              {formatCurrency(grandTotal)}
-            </td>
-
-            {/* Payable 영역 (빈 셀) */}
-            <td
-              className="border border-gray-300 px-3 py-2 bg-gray-50"
-              colSpan={3}
-            ></td>
-
-            {/* Total 영역 (빈 셀) */}
-            <td
-              className="border border-gray-300 px-3 py-2 bg-gray-50"
-              colSpan={2}
-            ></td>
-          </tr>
         </tbody>
       </table>
     </div>
