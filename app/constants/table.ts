@@ -3,7 +3,7 @@
  */
 
 // 헤더 높이
-export const HEADER_MAIN_HEIGHT = "186px";
+export const HEADER_MAIN_HEIGHT = "183px";
 export const HEADER_EMPTY_ROW_HEIGHT = "30px";
 export const HEADER_EMPTY_ROW_COUNT = 5;
 export const HEADER_TOTAL_ROWS = 6; // 1개 메인 + 5개 빈 행

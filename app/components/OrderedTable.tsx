@@ -23,36 +23,33 @@ export const OrderedTable = ({
   return (
     <table className="payment-table border-r-0">
       <thead>
-        <tr className="payment-table-header-row">
+        <tr className="table-header-row">
           <th
             colSpan={ORDERED_COLUMN_COUNT}
             rowSpan={HEADER_TOTAL_ROWS}
-            className="px-3 py-4 text-left font-bold border-r border-white align-middle text-sm text-black payment-table-header-main"
+            className="px-3 py-4 text-left font-bold align-middle text-sm text-black table-header-main"
           >
             Ordered
           </th>
         </tr>
         {Array.from({ length: HEADER_EMPTY_ROW_COUNT }).map((_, idx) => (
-          <tr
-            key={idx}
-            className="payment-table-header-row payment-table-header-empty-row"
-          >
+          <tr key={idx} className="table-header-row table-header-empty-row">
             <td
               colSpan={ORDERED_COLUMN_COUNT}
-              className="payment-table-empty-row"
+              className="table-empty-cell"
             ></td>
           </tr>
         ))}
-        <tr className="payment-table-header-row-bottom">
+        <tr className="table-header-row-bottom">
           {ORDERED_HEADER_COLUMNS.map((h) => (
-            <th key={h} className="payment-table-header-cell">
+            <th key={h} className="table-header-cell">
               {h}
             </th>
           ))}
-          <th className="payment-table-header-cell">Order Qty</th>
-          <th className="payment-table-header-cell">Unit</th>
-          <th className="payment-table-header-cell-unit-price">U/price</th>
-          <th className="payment-table-header-cell-amount">Amount</th>
+          <th className="table-header-cell">Order Qty</th>
+          <th className="table-header-cell">Unit</th>
+          <th className="table-header-unit-price">U/price</th>
+          <th className="table-header-amount border-r-0">Amount</th>
         </tr>
       </thead>
       <tbody className="font-normal text-black">
@@ -61,35 +58,33 @@ export const OrderedTable = ({
             {Array.from(style.suppliers.entries()).map(([supCode, items]) => (
               <Fragment key={supCode}>
                 {items.map((item: Consumption) => (
-                  <tr key={item.id} className="payment-table-data-row">
-                    <td className="payment-table-cell">
+                  <tr key={item.id} className="table-row-data">
+                    <td className="table-cell">
                       {item.salesOrder.styleNumber}
                     </td>
-                    <td className="payment-table-cell">
-                      {item.supplierItemCode}
-                    </td>
-                    <td className="payment-table-cell">{item.fabricName}</td>
-                    <td className="payment-table-cell">{item.colorName}</td>
-                    <td className="payment-table-cell-number">
+                    <td className="table-cell">{item.supplierItemCode}</td>
+                    <td className="table-cell">{item.fabricName}</td>
+                    <td className="table-cell">{item.colorName}</td>
+                    <td className="table-cell-number">
                       {formatNumber(item.orderQuantity)}
                     </td>
-                    <td className="payment-table-cell">{item.unit}</td>
-                    <td className="payment-table-cell-number">
+                    <td className="table-cell">{item.unit}</td>
+                    <td className="table-cell-number">
                       <PriceCell amount={item.unitPrice} type="unitPrice" />
                     </td>
-                    <td className="payment-table-cell-number">
+                    <td className="table-cell-number">
                       <PriceCell amount={item.orderAmount} />
                     </td>
                   </tr>
                 ))}
-                <tr className="payment-table-subtotal-row">
+                <tr className="table-row-subtotal">
                   <td
                     colSpan={ORDERED_SUBTOTAL_COLSPAN}
-                    className="px-2 py-2 text-right text-black"
+                    className="px-2 py-2 text-right text-black border-r border-gray-300"
                   >
                     Sub.TTL
                   </td>
-                  <td className="payment-table-cell-number border-r border-gray-300">
+                  <td className="table-cell-number border-r border-gray-300">
                     <PriceCell
                       amount={items.reduce(
                         (acc, cur) => acc + cur.orderAmount,
@@ -100,14 +95,14 @@ export const OrderedTable = ({
                 </tr>
               </Fragment>
             ))}
-            <tr className="payment-table-grandtotal-row">
+            <tr className="table-row-grandtotal">
               <td
                 colSpan={ORDERED_SUBTOTAL_COLSPAN}
-                className="px-2 py-2 text-right text-black"
+                className="px-2 py-2 text-right text-black border-r border-gray-300"
               >
                 G.TTL
               </td>
-              <td className="payment-table-cell-number border-r border-white">
+              <td className="table-cell-number">
                 <PriceCell
                   amount={
                     styleGroups

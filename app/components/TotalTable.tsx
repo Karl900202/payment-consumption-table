@@ -18,29 +18,23 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
   return (
     <table className="payment-table border-l-0">
       <thead>
-        <tr className="payment-table-header-row">
+        <tr className="table-header-row">
           <th
             colSpan={TOTAL_COLUMN_COUNT}
             rowSpan={HEADER_TOTAL_ROWS}
-            className="px-3 py-4 text-left font-bold align-middle text-sm text-black payment-table-header-main"
+            className="px-3 py-4 text-left font-bold align-middle text-sm text-black table-header-main"
           >
             Total
           </th>
         </tr>
         {Array.from({ length: HEADER_EMPTY_ROW_COUNT }).map((_, idx) => (
-          <tr
-            key={idx}
-            className="payment-table-header-row payment-table-header-empty-row"
-          >
-            <td
-              colSpan={TOTAL_COLUMN_COUNT}
-              className="payment-table-empty-row"
-            ></td>
+          <tr key={idx} className="table-header-row table-header-empty-row">
+            <td colSpan={TOTAL_COLUMN_COUNT} className="table-empty-cell"></td>
           </tr>
         ))}
-        <tr className="payment-table-header-row-bottom">
-          <th className="payment-table-header-cell">Qty</th>
-          <th className="payment-table-header-cell-amount">Amount</th>
+        <tr className="table-header-row-bottom">
+          <th className="table-header-cell">Qty</th>
+          <th className="table-header-amount">Amount</th>
         </tr>
       </thead>
       <tbody className="font-normal text-black">
@@ -49,22 +43,22 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
             {Array.from(style.suppliers.entries()).map(([supCode, items]) => (
               <Fragment key={supCode}>
                 {items.map((item) => (
-                  <tr key={item.id} className="payment-table-data-row">
-                    <td className="payment-table-cell-number">
+                  <tr key={item.id} className="table-row-data">
+                    <td className="table-cell-number">
                       {formatNumber(item.orderQuantity)}
                     </td>
-                    <td className="payment-table-cell-number">
+                    <td className="table-cell-number">
                       <PriceCell amount={item.orderAmount} />
                     </td>
                   </tr>
                 ))}
-                <tr className="payment-table-subtotal-row">
-                  <td className="payment-table-cell-number font-bold">
+                <tr className="table-row-subtotal">
+                  <td className="table-cell-number font-bold">
                     {formatNumber(
                       items.reduce((acc, cur) => acc + cur.orderQuantity, 0)
                     )}
                   </td>
-                  <td className="payment-table-cell-number font-bold border-l border-gray-100">
+                  <td className="table-cell-number font-bold border-l border-gray-100">
                     <PriceCell
                       amount={items.reduce(
                         (acc, cur) => acc + cur.orderAmount,
@@ -75,15 +69,15 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
                 </tr>
               </Fragment>
             ))}
-            <tr className="payment-table-grandtotal-row">
-              <td className="payment-table-cell-number font-bold align-middle">
+            <tr className="table-row-grandtotal">
+              <td className="table-cell-number font-bold align-middle">
                 {formatNumber(
                   consumptions
                     .filter((c) => c.salesOrder.styleNumber === style.sNo)
                     .reduce((acc, cur) => acc + cur.orderQuantity, 0)
                 )}
               </td>
-              <td className="payment-table-cell-number font-bold align-middle">
+              <td className="table-cell-number font-bold align-middle">
                 <PriceCell
                   amount={consumptions
                     .filter((c) => c.salesOrder.styleNumber === style.sNo)

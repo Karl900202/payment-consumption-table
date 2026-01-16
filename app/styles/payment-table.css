@@ -2,25 +2,26 @@
 
 /* ===== 테이블 컨테이너 및 기본 스타일 ===== */
 .payment-table-container {
-  @apply w-full overflow-x-auto border border-gray-400 bg-white;
+  @apply w-full overflow-x-auto bg-white;
 }
 
 .payment-table {
   @apply w-full border-collapse min-w-max text-black font-sans;
-  font-size: 11px;
+  font-size: 10px;
+  border: 0px;
 }
 
 /* ===== 헤더 행 ===== */
-.payment-table-header-row {
-  @apply bg-[#EBF1F7] border-b border-white;
+.table-header-row {
+  @apply bg-[#EBF1F7];
 }
 
-.payment-table-header-row-bottom {
-  @apply bg-[#EBF1F7] border-b border-gray-400;
+.table-header-row-bottom {
+  @apply bg-[#F5F8FC];
 }
 
 /* 빈 행 스타일 */
-.payment-table-empty-row {
+.table-empty-cell {
   padding: 0;
   height: 30px;
   line-height: 0;
@@ -28,99 +29,97 @@
 }
 
 /* 헤더 메인 셀 높이 */
-.payment-table-header-main {
-  height: 186px;
+.table-header-main {
+  height: 182px;
 }
 
 /* 빈 행 높이 */
-.payment-table-header-empty-row {
+.table-header-empty-row {
   height: 30px;
 }
 
 /* ===== 헤더 셀 ===== */
-/* 공통: px-2 py-2 text-left border-r border-white font-bold text-black */
-.payment-table-header-cell {
-  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+.table-header-cell {
+  @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
 }
 
-.payment-table-header-cell-shipped-qty {
-  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+.table-header-shipped-qty {
+  @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
   width: 96px;
   min-width: 96px;
 }
 
-.payment-table-header-cell-amount {
-  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+.table-header-amount {
+  @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
   min-width: 90px;
   width: 90px;
 }
 
-.payment-table-header-cell-unit-price {
-  @apply px-2 py-2 text-left border-r border-white font-bold text-black;
+/* Payable 테이블 각 payment 그룹 구분선 */
+.table-payment-group-divider {
+  border-right: 4px solid #e3e9ef !important;
+}
+
+.table-header-unit-price {
+  @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
   min-width: 90px;
   width: 90px;
 }
 
 /* ===== 데이터 셀 ===== */
-/* 공통: px-2 py-2 border-r border-gray-200 text-black */
-.payment-table-cell {
+.table-cell {
   @apply px-2 py-2 border-r border-gray-200 text-black;
 }
 
-.payment-table-cell-number {
+.table-cell-number {
   @apply px-2 py-2 border-r border-gray-200 text-right text-black;
 }
 
-.payment-table-cell-amount {
-  @apply px-2 py-2 border-r border-gray-200 text-right text-black font-medium;
-}
-
 /* ===== 행 스타일 ===== */
-.payment-table-data-row {
-  @apply border-b border-gray-100 hover:bg-gray-50;
+.table-row-data {
+  @apply border-b border-gray-200 hover:bg-gray-50;
 }
 
-.payment-table-subtotal-row {
-  @apply bg-[#F8FAFC] border-b border-gray-300 font-bold text-black;
+.table-row-subtotal {
+  @apply bg-[#F5F8FC] font-bold text-black;
 }
 
-.payment-table-grandtotal-row {
-  @apply bg-[#EBF1F7] border-b border-gray-400 font-bold text-black uppercase;
+.table-row-grandtotal {
+  @apply bg-[#F5F8FC] border-t border-gray-200 font-bold text-black uppercase;
 }
 
 /* ===== Payable 헤더 내부 스타일 ===== */
-.payment-table-payable-label {
-  @apply w-24 px-3 py-2 bg-[#EBF1F7] font-bold text-black shrink-0;
+.table-payable-label {
+  @apply w-24 px-3 py-2 bg-[#F5F8FC] font-bold text-black shrink-0;
 }
 
-/* 공통: flex-1 px-3 py-2 bg-white border-l border-white */
-.payment-table-payable-value-left {
-  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white text-left;
+.table-payable-value-left {
+  @apply flex-1 px-3 py-2 bg-white text-black text-left;
 }
 
-.payment-table-payable-value-center {
-  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white flex items-center gap-1;
+.table-payable-value-center {
+  @apply flex-1 px-3 py-2 bg-white text-black flex items-center gap-1;
 }
 
-.payment-table-payable-value-overflow {
-  @apply flex-1 px-3 py-2 bg-white border-l border-white overflow-hidden;
+.table-payable-value-overflow {
+  @apply flex-1 px-3 py-2 bg-white overflow-hidden;
 }
 
-.payment-table-payable-value-truncate {
-  @apply flex-1 px-3 py-2 bg-white text-black border-l border-white truncate text-left;
+.table-payable-value-truncate {
+  @apply flex-1 px-3 py-2 bg-white text-black truncate text-left;
 }
 
 /* ===== 기타 컴포넌트 ===== */
-.payment-table-dollar {
+.table-dollar {
   @apply float-left;
 }
 
-.payment-table-paid-badge {
+.table-paid-badge {
   @apply bg-[#EEF2FF] text-[#6366F1] px-1 rounded font-bold border border-[#6366F1]/20;
   font-size: 8px;
 }
 
-.payment-table-attachment-file {
+.table-attachment-file {
   @apply bg-gray-200 border border-gray-300 px-2 py-0.25 rounded text-black truncate;
   font-size: 8px;
 }

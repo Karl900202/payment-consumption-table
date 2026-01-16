@@ -11,7 +11,7 @@ export const PriceCell = ({ amount, type = "currency" }: PriceCellProps) => {
 
   return (
     <>
-      <span className="payment-table-dollar">$</span> {formattedValue}
+      <span className="table-dollar">$</span> {formattedValue}
     </>
   );
 };
