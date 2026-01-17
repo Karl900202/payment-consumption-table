@@ -14,7 +14,7 @@ export default function Page() {
   const styleGroups = useMemo(() => {
     const map = new Map<string, StyleGroup>();
     consumptions.forEach((c) => {
-      const sNo = c.salesOrder.styleNumber;
+      const sNo = c.salesOrder.id.toString();
       if (!map.has(sNo)) map.set(sNo, { sNo, suppliers: new Map() });
       const sGroup = map.get(sNo)!.suppliers;
       if (!sGroup.has(c.supplierItemCode)) sGroup.set(c.supplierItemCode, []);

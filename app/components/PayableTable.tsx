@@ -3,6 +3,7 @@ import { StyleGroup } from "@/types/table";
 import { Fragment, useMemo } from "react";
 import { formatNumber, formatDate } from "@/lib/format";
 import { PriceCell } from "./PriceCell";
+import { useOrderedTableStore } from "@/store/orderedTableStore";
 import { PAYABLE_COLUMNS_PER_PAYMENT } from "@/constants/table";
 
 interface PayableTableProps {
@@ -19,6 +20,8 @@ export const PayableTable = ({
   consumptions,
   breakdownMap,
 }: PayableTableProps) => {
+  const { isSearchRowVisible, setSearchRowVisible } = useOrderedTableStore();
+
   const payableColSpan = useMemo(
     () => payments.length * PAYABLE_COLUMNS_PER_PAYMENT,
     [payments.length]
@@ -98,6 +101,19 @@ export const PayableTable = ({
             </Fragment>
           ))}
         </tr>
+        {isSearchRowVisible && (
+          <tr className="table-header-row table-payment-group-divider table-header-row-search">
+            {payments.map((p, idx) => (
+              <Fragment key={p.id}>
+                <th className="table-header-shipped-qty"></th>
+                <th className="table-header-unit-price"></th>
+                <th
+                  className={`table-header-amount table-payment-group-divider`}
+                ></th>
+              </Fragment>
+            ))}
+          </tr>
+        )}
       </thead>
       <tbody className="font-normal text-black">
         {styleGroups.map((style) => (
@@ -166,7 +182,7 @@ export const PayableTable = ({
             <tr className="table-row-grandtotal">
               {payments.map((p, pIdx) => {
                 const styleConsumptions = consumptions.filter(
-                  (c) => c.salesOrder.styleNumber === style.sNo
+                  (c) => c.salesOrder.id.toString() === style.sNo
                 );
                 const { amount: styleAmt, quantity: styleQty } =
                   styleConsumptions.reduce(

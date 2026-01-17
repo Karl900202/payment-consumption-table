@@ -7,7 +7,7 @@
 
 .payment-table {
   @apply w-full border-collapse min-w-max text-black font-sans;
-  font-size: 10px;
+  font-size: 12px;
   border: 0px;
 }
 
@@ -18,6 +18,14 @@
 
 .table-header-row-bottom {
   @apply bg-[#F5F8FC];
+  height: 36px;
+}
+
+.table-header-row-search {
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  overflow: visible;
 }
 
 /* 빈 행 스타일 */
@@ -35,24 +43,54 @@
 
 /* 빈 행 높이 */
 .table-header-empty-row {
-  height: 30px;
+  height: 36px;
 }
 
 /* ===== 헤더 셀 ===== */
 .table-header-cell {
   @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  height: 36px;
+}
+
+.table-header-cell-wide {
+  min-width: 150px;
+  width: 150px;
+}
+
+.table-header-cell-dropdown {
+  overflow: visible !important;
+  position: relative;
+}
+
+.table-header-cell-icon {
+  width: 20px;
+  min-width: 20px;
+  max-width: 20px;
+  padding-left: 8px;
 }
 
 .table-header-shipped-qty {
   @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   width: 96px;
   min-width: 96px;
+  max-width: 96px;
 }
 
 .table-header-amount {
   @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 90px;
   width: 90px;
+  max-width: 90px;
 }
 
 /* Payable 테이블 각 payment 그룹 구분선 */
@@ -62,30 +100,47 @@
 
 .table-header-unit-price {
   @apply px-2 py-2 text-left font-bold text-black border-r border-gray-200;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 90px;
   width: 90px;
+  max-width: 90px;
 }
 
 /* ===== 데이터 셀 ===== */
 .table-cell {
   @apply px-2 py-2 border-r border-gray-200 text-black;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.table-cell-wide {
+  min-width: 150px;
+  width: 150px;
+  max-width: 150px;
 }
 
 .table-cell-number {
-  @apply px-2 py-2 border-r border-gray-200 text-right text-black;
+  @apply px-2 py-2 border-r border-gray-200 text-right text-black whitespace-nowrap;
 }
 
 /* ===== 행 스타일 ===== */
 .table-row-data {
   @apply border-b border-gray-200 hover:bg-gray-50;
+  height: 36px;
 }
 
 .table-row-subtotal {
   @apply bg-[#F5F8FC] font-bold text-black;
+  height: 36px;
 }
 
 .table-row-grandtotal {
   @apply bg-[#F5F8FC] border-t border-gray-200 font-bold text-black uppercase;
+  height: 36px;
 }
 
 /* ===== Payable 헤더 내부 스타일 ===== */

@@ -1,14 +1,15 @@
 import { Consumption } from "@/types/domain";
 import { StyleGroup } from "@/types/table";
-import { Fragment } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { formatNumber } from "@/lib/format";
 import { PriceCell } from "./PriceCell";
+import { FilterDropdown } from "./FilterDropdown";
+import { useOrderedTableStore } from "@/store/orderedTableStore";
 import {
   HEADER_EMPTY_ROW_COUNT,
   HEADER_TOTAL_ROWS,
   ORDERED_COLUMN_COUNT,
   ORDERED_SUBTOTAL_COLSPAN,
-  ORDERED_HEADER_COLUMNS,
 } from "@/constants/table";
 
 interface OrderedTableProps {
@@ -20,12 +21,42 @@ export const OrderedTable = ({
   styleGroups,
   consumptions,
 }: OrderedTableProps) => {
+  // 검색 행 토글 상태 관리
+  const { isSearchRowVisible, toggleSearchRow, setSearchRowVisible } =
+    useOrderedTableStore();
+
+  // 필터 상태 관리
+  const [filters, setFilters] = useState<{
+    styleNumber?: string;
+    fabricName?: string;
+    colorName?: string;
+  }>({});
+
+  // 각 컬럼의 고유값 추출
+  const uniqueValues = useMemo(() => {
+    const styleNumbers = Array.from(
+      new Set(consumptions.map((c) => c.salesOrder.styleNumber))
+    ).sort();
+    const fabricNames = Array.from(
+      new Set(consumptions.map((c) => c.fabricName))
+    ).sort();
+    const colorNames = Array.from(
+      new Set(consumptions.map((c) => c.colorName))
+    ).sort();
+
+    return {
+      styleNumbers,
+      fabricNames,
+      colorNames,
+    };
+  }, [consumptions]);
+
   return (
-    <table className="payment-table border-r-0">
-      <thead>
+    <table className="payment-table border-r-0" style={{ overflow: "visible" }}>
+      <thead style={{ overflow: "visible" }}>
         <tr className="table-header-row">
           <th
-            colSpan={ORDERED_COLUMN_COUNT}
+            colSpan={ORDERED_COLUMN_COUNT + 1}
             rowSpan={HEADER_TOTAL_ROWS}
             className="px-3 py-4 text-left font-bold align-middle text-sm text-black table-header-main"
           >
@@ -41,16 +72,83 @@ export const OrderedTable = ({
           </tr>
         ))}
         <tr className="table-header-row-bottom">
-          {ORDERED_HEADER_COLUMNS.map((h) => (
-            <th key={h} className="table-header-cell">
-              {h}
-            </th>
-          ))}
+          <th
+            className={`table-header-cell-icon ${
+              !isSearchRowVisible ? "cursor-pointer" : ""
+            }`}
+            onClick={isSearchRowVisible ? () => {} : toggleSearchRow}
+          >
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </th>
+          <th className="table-header-cell table-header-cell-wide">
+            Style No.
+          </th>
+          <th className="table-header-cell">Supplier Item #</th>
+          <th className="table-header-cell table-header-cell-wide">
+            Fabric Name
+          </th>
+          <th className="table-header-cell table-header-cell-wide">
+            Fabric Color
+          </th>
           <th className="table-header-cell">Order Qty</th>
           <th className="table-header-cell">Unit</th>
           <th className="table-header-unit-price">U/price</th>
           <th className="table-header-amount border-r-0">Amount</th>
         </tr>
+        {isSearchRowVisible && (
+          <tr className="table-header-row bg-[#EBF1F7] table-header-row-search">
+            <th
+              className="table-header-cell-icon cursor-pointer"
+              onClick={() => setSearchRowVisible(false)}
+            >
+              X
+            </th>
+            <th className="px-2 py-2 table-header-cell table-header-cell-dropdown">
+              <FilterDropdown
+                options={uniqueValues.styleNumbers}
+                value={filters.styleNumber}
+                onChange={(value) =>
+                  setFilters({ ...filters, styleNumber: value })
+                }
+              />
+            </th>
+            <th className="table-header-cell"></th>
+            <th className="table-header-cell table-header-cell-dropdown">
+              <FilterDropdown
+                options={uniqueValues.fabricNames}
+                value={filters.fabricName}
+                onChange={(value) =>
+                  setFilters({ ...filters, fabricName: value })
+                }
+              />
+            </th>
+            <th className="table-header-cell table-header-cell-dropdown">
+              <FilterDropdown
+                options={uniqueValues.colorNames}
+                value={filters.colorName}
+                onChange={(value) =>
+                  setFilters({ ...filters, colorName: value })
+                }
+              />
+            </th>
+            <th className="table-header-cell"></th>
+            <th className="table-header-cell"></th>
+            <th className="table-header-cell"></th>
+            <th className="table-header-cell border-r-0 px-2 py-2"></th>
+          </tr>
+        )}
       </thead>
       <tbody className="font-normal text-black">
         {styleGroups.map((style) => (
@@ -59,12 +157,17 @@ export const OrderedTable = ({
               <Fragment key={supCode}>
                 {items.map((item: Consumption) => (
                   <tr key={item.id} className="table-row-data">
-                    <td className="table-cell">
+                    <td></td>
+                    <td className="table-cell table-cell-wide">
                       {item.salesOrder.styleNumber}
                     </td>
-                    <td className="table-cell">{item.supplierItemCode}</td>
+                    <td className="table-cell table-cell-wide">
+                      {item.supplierItemCode}
+                    </td>
                     <td className="table-cell">{item.fabricName}</td>
-                    <td className="table-cell">{item.colorName}</td>
+                    <td className="table-cell table-cell-wide">
+                      {item.colorName}
+                    </td>
                     <td className="table-cell-number">
                       {formatNumber(item.orderQuantity)}
                     </td>
@@ -111,7 +214,7 @@ export const OrderedTable = ({
                       .next()
                       .value?.reduce((acc, cur) => acc + cur.orderAmount, 0) ||
                     consumptions
-                      .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                      .filter((c) => c.salesOrder.id.toString() === style.sNo)
                       .reduce((acc, cur) => acc + cur.orderAmount, 0)
                   }
                 />

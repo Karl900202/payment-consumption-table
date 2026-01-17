@@ -3,6 +3,7 @@ import { StyleGroup } from "@/types/table";
 import { Fragment } from "react";
 import { formatNumber } from "@/lib/format";
 import { PriceCell } from "./PriceCell";
+import { useOrderedTableStore } from "@/store/orderedTableStore";
 import {
   HEADER_EMPTY_ROW_COUNT,
   HEADER_TOTAL_ROWS,
@@ -15,6 +16,8 @@ interface TotalTableProps {
 }
 
 export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
+  const { isSearchRowVisible, setSearchRowVisible } = useOrderedTableStore();
+
   return (
     <table className="payment-table border-l-0">
       <thead>
@@ -36,6 +39,12 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
           <th className="table-header-cell">Qty</th>
           <th className="table-header-amount">Amount</th>
         </tr>
+        {isSearchRowVisible && (
+          <tr className="table-header-row bg-[#EBF1F7] table-header-row-search">
+            <th className="table-header-cell"></th>
+            <th className="table-header-cell"></th>
+          </tr>
+        )}
       </thead>
       <tbody className="font-normal text-black">
         {styleGroups.map((style) => (
@@ -73,14 +82,14 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
               <td className="table-cell-number font-bold align-middle">
                 {formatNumber(
                   consumptions
-                    .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                    .filter((c) => c.salesOrder.id.toString() === style.sNo)
                     .reduce((acc, cur) => acc + cur.orderQuantity, 0)
                 )}
               </td>
               <td className="table-cell-number font-bold align-middle">
                 <PriceCell
                   amount={consumptions
-                    .filter((c) => c.salesOrder.styleNumber === style.sNo)
+                    .filter((c) => c.salesOrder.id.toString() === style.sNo)
                     .reduce((acc, cur) => acc + cur.orderAmount, 0)}
                 />
               </td>
