@@ -16,10 +16,14 @@ interface TotalTableProps {
 }
 
 const TotalTableComponent = ({ styleGroups, consumptions }: TotalTableProps) => {
-  const { isSearchRowVisible, setSearchRowVisible } = useOrderedTableStore();
+  const { isSearchRowVisible } = useOrderedTableStore();
 
   return (
-    <table className="payment-table border-l-0">
+    <table className="payment-table border-l-0" style={{ width: "100%" }}>
+      <colgroup>
+        <col style={{ width: "45%" }} />
+        <col style={{ width: "55%" }} />
+      </colgroup>
       <thead>
         <tr className="table-header-row">
           <th

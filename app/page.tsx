@@ -53,7 +53,7 @@ export default function Page() {
 
   return (
     <main style={{ padding: 24 }}>
-      <div className="payment-table-container flex flex-row items-start overflow-x-auto">
+      <div className="payment-table-container flex flex-row items-start">
         <OrderedTable styleGroups={styleGroups} consumptions={filteredConsumptions} />
         <PayableTable
           payments={payments}

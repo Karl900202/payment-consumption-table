@@ -2,13 +2,14 @@
 
 /* ===== 테이블 컨테이너 및 기본 스타일 ===== */
 .payment-table-container {
-  @apply w-full overflow-x-auto bg-white;
+  @apply bg-white;
 }
 
 .payment-table {
-  @apply w-full border-collapse min-w-max text-black font-sans;
+  @apply border-collapse text-black font-sans;
   font-size: 12px;
   border: 0px;
+  width: 100%;
 }
 
 /* ===== 헤더 행 ===== */
