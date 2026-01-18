@@ -52,7 +52,7 @@ const FilterDropdownComponent = ({
   const displayValue = value || placeholder;
   
   return (
-    <div className="relative w-[150px]" ref={dropdownRef}>
+    <div className="relative w-[132px]" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
