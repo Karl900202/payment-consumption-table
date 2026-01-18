@@ -1,9 +1,18 @@
 import { create } from "zustand";
 
+interface Filters {
+  styleNumber?: string;
+  fabricName?: string;
+  colorName?: string;
+}
+
 interface OrderedTableStore {
   isSearchRowVisible: boolean;
   toggleSearchRow: () => void;
   setSearchRowVisible: (visible: boolean) => void;
+  filters: Filters;
+  setFilters: (filters: Filters | ((prev: Filters) => Filters)) => void;
+  clearFilters: () => void;
 }
 
 export const useOrderedTableStore = create<OrderedTableStore>((set) => ({
@@ -12,4 +21,10 @@ export const useOrderedTableStore = create<OrderedTableStore>((set) => ({
     set((state) => ({ isSearchRowVisible: !state.isSearchRowVisible })),
   setSearchRowVisible: (visible: boolean) =>
     set({ isSearchRowVisible: visible }),
+  filters: {},
+  setFilters: (filters) =>
+    set((state) => ({
+      filters: typeof filters === "function" ? filters(state.filters) : filters,
+    })),
+  clearFilters: () => set({ filters: {} }),
 }));

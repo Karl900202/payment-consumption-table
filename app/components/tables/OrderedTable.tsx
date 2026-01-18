@@ -2,9 +2,10 @@ import { Consumption } from "@/types/domain";
 import { StyleGroup } from "@/types/table";
 import { Fragment, useMemo, useState } from "react";
 import { formatNumber } from "@/lib/format";
-import { PriceCell } from "./PriceCell";
-import { FilterDropdown } from "./FilterDropdown";
+import { PriceCell } from "../ui/PriceCell";
+import { FilterDropdown } from "../forms/FilterDropdown";
 import { useOrderedTableStore } from "@/store/orderedTableStore";
+import Modal from "../ui/Modal";
 import {
   HEADER_EMPTY_ROW_COUNT,
   HEADER_TOTAL_ROWS,
@@ -17,20 +18,67 @@ interface OrderedTableProps {
   consumptions: Consumption[];
 }
 
-export const OrderedTable = ({
+const OrderedTableComponent = ({
   styleGroups,
   consumptions,
 }: OrderedTableProps) => {
-  // 검색 행 토글 상태 관리
-  const { isSearchRowVisible, toggleSearchRow, setSearchRowVisible } =
+  // 검색 행 토글 상태 및 필터 상태 관리
+  const { isSearchRowVisible, toggleSearchRow, setSearchRowVisible, filters, setFilters, clearFilters } =
     useOrderedTableStore();
+  
+  // 모달 표시 상태
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // 필터 상태 관리
-  const [filters, setFilters] = useState<{
-    styleNumber?: string;
-    fabricName?: string;
-    colorName?: string;
-  }>({});
+  // X 버튼 클릭 핸들러
+  const handleCloseSearchRow = () => {
+    const hasActiveFilters =
+      (filters.styleNumber && filters.styleNumber !== "All") ||
+      (filters.fabricName && filters.fabricName !== "All") ||
+      (filters.colorName && filters.colorName !== "All");
+
+    if (hasActiveFilters) {
+      // 필터가 적용되어 있으면 모달 표시
+      setShowConfirmModal(true);
+    } else {
+      // 필터가 없으면 바로 실행
+      clearFilters();
+      setSearchRowVisible(false);
+    }
+  };
+
+  // 필터 변경 핸들러들
+  const handleStyleNumberChange = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      styleNumber: value,
+    }));
+  };
+
+  const handleFabricNameChange = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      fabricName: value,
+    }));
+  };
+
+  const handleColorNameChange = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      colorName: value,
+    }));
+  };
+
+  // 모달 확인 핸들러
+  const handleModalConfirm = () => {
+    clearFilters();
+    setSearchRowVisible(false);
+    setShowConfirmModal(false);
+  };
+
+  // 모달 취소 핸들러
+  const handleModalCancel = () => {
+    setShowConfirmModal(false);
+  };
 
   // 각 컬럼의 고유값 추출
   const uniqueValues = useMemo(() => {
@@ -52,7 +100,8 @@ export const OrderedTable = ({
   }, [consumptions]);
 
   return (
-    <table className="payment-table border-r-0" style={{ overflow: "visible" }}>
+    <>
+      <table className="payment-table border-r-0" style={{ overflow: "visible" }}>
       <thead style={{ overflow: "visible" }}>
         <tr className="table-header-row">
           <th
@@ -111,7 +160,7 @@ export const OrderedTable = ({
           <tr className="table-header-row bg-[#EBF1F7] table-header-row-search">
             <th
               className="table-header-cell-icon cursor-pointer"
-              onClick={() => setSearchRowVisible(false)}
+              onClick={handleCloseSearchRow}
             >
               X
             </th>
@@ -119,9 +168,7 @@ export const OrderedTable = ({
               <FilterDropdown
                 options={uniqueValues.styleNumbers}
                 value={filters.styleNumber}
-                onChange={(value) =>
-                  setFilters({ ...filters, styleNumber: value })
-                }
+                onChange={handleStyleNumberChange}
               />
             </th>
             <th className="table-header-cell"></th>
@@ -129,18 +176,14 @@ export const OrderedTable = ({
               <FilterDropdown
                 options={uniqueValues.fabricNames}
                 value={filters.fabricName}
-                onChange={(value) =>
-                  setFilters({ ...filters, fabricName: value })
-                }
+                onChange={handleFabricNameChange}
               />
             </th>
             <th className="table-header-cell table-header-cell-dropdown">
               <FilterDropdown
                 options={uniqueValues.colorNames}
                 value={filters.colorName}
-                onChange={(value) =>
-                  setFilters({ ...filters, colorName: value })
-                }
+                onChange={handleColorNameChange}
               />
             </th>
             <th className="table-header-cell"></th>
@@ -181,8 +224,9 @@ export const OrderedTable = ({
                   </tr>
                 ))}
                 <tr className="table-row-subtotal">
+                  
                   <td
-                    colSpan={ORDERED_SUBTOTAL_COLSPAN}
+                    colSpan={ORDERED_SUBTOTAL_COLSPAN + 1}
                     className="px-2 py-2 text-right text-black border-r border-gray-300"
                   >
                     Sub.TTL
@@ -199,24 +243,18 @@ export const OrderedTable = ({
               </Fragment>
             ))}
             <tr className="table-row-grandtotal">
+              
               <td
-                colSpan={ORDERED_SUBTOTAL_COLSPAN}
+                colSpan={ORDERED_SUBTOTAL_COLSPAN + 1}
                 className="px-2 py-2 text-right text-black border-r border-gray-300"
               >
                 G.TTL
               </td>
               <td className="table-cell-number">
                 <PriceCell
-                  amount={
-                    styleGroups
-                      .find((sg) => sg.sNo === style.sNo)
-                      ?.suppliers.values()
-                      .next()
-                      .value?.reduce((acc, cur) => acc + cur.orderAmount, 0) ||
-                    consumptions
-                      .filter((c) => c.salesOrder.id.toString() === style.sNo)
-                      .reduce((acc, cur) => acc + cur.orderAmount, 0)
-                  }
+                  amount={Array.from(style.suppliers.values())
+                    .flat()
+                    .reduce((acc, cur) => acc + cur.orderAmount, 0)}
                 />
               </td>
             </tr>
@@ -224,5 +262,19 @@ export const OrderedTable = ({
         ))}
       </tbody>
     </table>
+    {showConfirmModal && (
+      <Modal
+        show={showConfirmModal}
+        title="검색 조건 초기화"
+        description="현재 설정된 검색 조건이 모두 초기화됩니다. 계속하시겠습니까?"
+        confirmText="확인"
+        cancelText="취소"
+        onCancel={handleModalCancel}
+        onConfirm={handleModalConfirm}
+      />
+    )}
+    </>
   );
 };
+
+export const OrderedTable = OrderedTableComponent;

@@ -2,7 +2,7 @@ import { Consumption, Payment, PaymentBreakdown } from "@/types/domain";
 import { StyleGroup } from "@/types/table";
 import { Fragment, useMemo } from "react";
 import { formatNumber, formatDate } from "@/lib/format";
-import { PriceCell } from "./PriceCell";
+import { PriceCell } from "../ui/PriceCell";
 import { useOrderedTableStore } from "@/store/orderedTableStore";
 import { PAYABLE_COLUMNS_PER_PAYMENT } from "@/constants/table";
 
@@ -14,7 +14,7 @@ interface PayableTableProps {
   breakdownMap: Map<string, PaymentBreakdown>;
 }
 
-export const PayableTable = ({
+const PayableTableComponent = ({
   payments,
   styleGroups,
   consumptions,
@@ -217,3 +217,5 @@ export const PayableTable = ({
     </table>
   );
 };
+
+export const PayableTable = PayableTableComponent;

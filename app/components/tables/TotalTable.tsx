@@ -2,7 +2,7 @@ import { Consumption } from "@/types/domain";
 import { StyleGroup } from "@/types/table";
 import { Fragment } from "react";
 import { formatNumber } from "@/lib/format";
-import { PriceCell } from "./PriceCell";
+import { PriceCell } from "../ui/PriceCell";
 import { useOrderedTableStore } from "@/store/orderedTableStore";
 import {
   HEADER_EMPTY_ROW_COUNT,
@@ -15,7 +15,7 @@ interface TotalTableProps {
   consumptions: Consumption[];
 }
 
-export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
+const TotalTableComponent = ({ styleGroups, consumptions }: TotalTableProps) => {
   const { isSearchRowVisible, setSearchRowVisible } = useOrderedTableStore();
 
   return (
@@ -100,3 +100,5 @@ export const TotalTable = ({ styleGroups, consumptions }: TotalTableProps) => {
     </table>
   );
 };
+
+export const TotalTable = TotalTableComponent;

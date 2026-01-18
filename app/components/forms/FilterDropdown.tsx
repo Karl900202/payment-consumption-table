@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 interface FilterDropdownProps {
   options: string[];
@@ -9,7 +9,7 @@ interface FilterDropdownProps {
   placeholder?: string;
 }
 
-export const FilterDropdown = ({
+const FilterDropdownComponent = ({
   options,
   value = "",
   onChange,
@@ -35,8 +35,12 @@ export const FilterDropdown = ({
     };
   }, []);
 
-  const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(searchText.toLowerCase())
+  const filteredOptions = useMemo(
+    () =>
+      options.filter((option) =>
+        option.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [options, searchText]
   );
 
   const handleSelect = (selectedValue: string) => {
@@ -46,16 +50,16 @@ export const FilterDropdown = ({
   };
 
   const displayValue = value || placeholder;
-  console.log(displayValue, value);
+  
   return (
-    <div className="relative w-full" ref={dropdownRef}>
+    <div className="relative w-[150px]" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full min-h-[26px] px-1 py-0.5 border border-gray-300 rounded bg-white text-left flex items-center justify-between"
       >
         <span
-          className={`text-xs font-normal ${!value ? "text-gray-400" : ""}`}
+          className={`text-xs font-normal truncate min-w-0 flex-1 ${!value ? "text-gray-400" : ""}`}
         >
           {displayValue}
         </span>
@@ -108,7 +112,7 @@ export const FilterDropdown = ({
               type="button"
               onClick={() => handleSelect("All")}
               className={
-                "w-full px-2 py-1.5 text-xs text-left text-gray-700 flex items-center hover:bg-[#EBEBFA]"
+                `w-full px-2 py-1.5 text-xs text-left text-gray-700 flex items-center hover:bg-[#EBEBFA] ${value === "All" && "bg-[#EBEBFA]"}`
               }
             >
               <span>All</span>
@@ -131,3 +135,5 @@ export const FilterDropdown = ({
     </div>
   );
 };
+
+export const FilterDropdown = FilterDropdownComponent;

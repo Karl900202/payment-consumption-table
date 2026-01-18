@@ -116,7 +116,7 @@ export const mockData: {
       unitPrice: 3.2,
       orderQuantity: 1000,
       orderAmount: 3200,
-      fabricName: "Woven",
+      fabricName: "Woven3",
       fabricClass: "Solid",
       fabricDetail: "Description",
       supplierItemCode: "F0228",
