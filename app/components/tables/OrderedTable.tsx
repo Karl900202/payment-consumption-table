@@ -162,7 +162,19 @@ const OrderedTableComponent = ({
               className="table-header-cell-icon cursor-pointer"
               onClick={handleCloseSearchRow}
             >
-              X
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </th>
             <th className="px-2 py-2 table-header-cell table-header-cell-dropdown">
               <FilterDropdown

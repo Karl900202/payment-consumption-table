@@ -19,14 +19,28 @@
 
 .table-header-row-bottom {
   @apply bg-[#F5F8FC];
-  height: 36px;
+  height: 40px;
+}
+
+.table-header-row-bottom th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #F5F8FC;
 }
 
 .table-header-row-search {
-  height: 42px;
+  height: 44px;
   min-height: 42px;
   max-height: 42px;
   overflow: visible;
+}
+
+.table-header-row-search th {
+  position: sticky;
+  top: 36px;
+  z-index: 10;
+  background-color: #EBF1F7;
 }
 
 /* 빈 행 스타일 */

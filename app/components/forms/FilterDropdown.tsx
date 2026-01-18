@@ -56,7 +56,7 @@ const FilterDropdownComponent = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full min-h-[26px] px-1 py-0.5 border border-gray-300 rounded bg-white text-left flex items-center justify-between"
+        className="w-full min-h-[28px] px-1 py-0.5 border border-gray-300 rounded bg-white text-left flex items-center justify-between"
       >
         <span
           className={`text-xs font-normal truncate min-w-0 flex-1 ${!value ? "text-gray-400" : ""}`}
