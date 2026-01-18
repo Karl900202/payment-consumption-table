@@ -57,6 +57,7 @@
 
 ## 폴더 구조 간략 설명
 
+```
 payment-consumption-table/
 ├── app/                         # Next App Router
 │   ├── components/              # React 컴포넌트
@@ -88,6 +89,7 @@ payment-consumption-table/
 ├── public/                      
 ├── package.json
 └── tsconfig.json
+```
 
 ## 주요 설계 의도와 트레이드오프 2~3개
 
