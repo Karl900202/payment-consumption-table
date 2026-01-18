@@ -98,6 +98,9 @@ payment-consumption-table/
 -복잡한 테이블 구조를 Ordered, Payable, Total 3개의 테이블로 분리해 가독성과 유지보수성 향상
 -검색필터 토글 상태를 3개의 테이블에 공유하기 위한 방법으로 전역 상태관리 Zustant 사용
 -선택된 필터값을 최상위 컴포넌트에 전파하기 위한 방법으로 전역 상태관리 Zustant 사용
+-숫자 데이터 셀은 콘텐츠 생략 없이 셀 너비를 자동 확장하여 전체 값을 표시하도록 구현했습니다
+-데이터 타입별로 적절한 포맷팅을 제공하기 위해 lib/format.ts에 각각의 전용 함수를 분리했습니다
+  (금액: formatCurrency, 단가: formatUnitPrice, 수량: formatNumber)
 
 트레이드오프
 1.Zustand 전역 상태 관리 vs Props Drilling
