@@ -208,7 +208,7 @@ const OrderedTableComponent = ({
       <tbody className="font-normal text-black">
         {styleGroups.map((style) => (
           <Fragment key={style.sNo}>
-            {Array.from(style.suppliers.entries()).map(([supCode, items]) => (
+            {Array.from(style.suppliers,([supCode, items]) => (
               <Fragment key={supCode}>
                 {items.map((item: Consumption) => (
                   <tr key={item.id} className="table-row-data">

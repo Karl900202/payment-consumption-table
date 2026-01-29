@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "./styles/payment-table.css";
+@import "../styles/payment-table.css";
 
 :root {
   --background: #ffffff;
